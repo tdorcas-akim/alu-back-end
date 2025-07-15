@@ -13,8 +13,8 @@ if __name__ == "__main__":
     for user in users:
         user_id = user.get("id")
         username = user.get("username")
-        todos_url =(
-        f"https://jsonplaceholder.typicode.com/todos?userId={user_id}"
+        todos_url = (
+            f"https://jsonplaceholder.typicode.com/todos?userId={user_id}"
         )
         todos = requests.get(todos_url).json()
 
