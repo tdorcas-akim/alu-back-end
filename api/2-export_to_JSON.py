@@ -4,6 +4,7 @@ This script gets data from a fake online API for a specific employee ID,
 and saves all their tasks into a JSON file.
 """
 
+
 import json
 import requests
 import sys
@@ -38,7 +39,7 @@ if __name__ == "__main__":
             print("User not found.")
             sys.exit(1)
 
-        # Now let's get their TODO tasks
+        # Now let's get their todo tasks
         todos_url = "{}/todos?userId={}".format(base_url, employee_id)
         todos_response = requests.get(todos_url)
         todos_response.raise_for_status()
