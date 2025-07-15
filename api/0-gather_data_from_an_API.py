@@ -25,8 +25,8 @@ if __name__ == "__main__":
     base_url = "https://jsonplaceholder.typicode.com/"
 
     # --- Step 1: Get Employee Information ---
-    #We will send a request to get the user's details, like their name."
-    #The URL wil be something like: https://jsonplaceholder.typicode.com/users/2"
+    # We will send a request to get the user's details, like their name."  
+    # The URL wil be like: https://jsonplaceholder.typicode.com/users/2"
     user_url = base_url + "users/" + str(employee_id)
 
     # We make the request to get the user's information
@@ -42,11 +42,9 @@ if __name__ == "__main__":
     except ValueError:
         print("Error: Could not decode user JSON response.")
         sys.exit(1)
-
-
     # --- Step 2: Get Employee's TODO List ---
-    #Now, let's get all the tasks for this employee.
-    #The API lets us filter todos by userID.
+    # Now, let's get all the tasks for this employee.
+    # The API lets us filter todos by userID.
     # The URL will be:  "https://.../todos?userId=2"
     todos_url = base_url + "todos"
     # We pass the employee ID as a parameter in the URL
@@ -63,8 +61,6 @@ if __name__ == "__main__":
     except ValueError:
         print("Error: Could not decode TODO JSON response.")
         sys.exit(1)
-
-
     # --- Step 3: Process the TODO list ---
     # We need to count how many tasks are done and what their titles are.
     completed_tasks = []
@@ -79,8 +75,6 @@ if __name__ == "__main__":
             completed_tasks.append(task.get("title"))
 
     number_of_done_tasks = len(completed_tasks)
-
-
     # --- Step 4: Display the Result ---
     # We check if we found an employee name before printing
     if employee_name:
