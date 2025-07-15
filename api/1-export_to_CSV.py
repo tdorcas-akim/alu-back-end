@@ -15,7 +15,8 @@ if __name__ == "__main__":
         sys.stderr.write("Usage: {} <employee_id>\n".format(sys.argv[0]))
         sys.exit(1)
 
-    # We'll try to convert the argument to an integer. If it fails, it's bad input.
+    # We'll try to convert the argument to an integer. 
+    # If it fails, it's bad input.
     try:
         employee_id = int(sys.argv[1])
     except ValueError:
