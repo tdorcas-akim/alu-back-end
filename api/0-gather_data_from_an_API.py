@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # Base URL for the API
     base_url = "https://jsonplaceholder.typicode.com/"
     # --- Step 1: Get Employee Information ---
-    # We will send a request to get the user's details, like their name."  
+    # We will send a request to get the user's details, like their name"
     # The URL wil be like: https://jsonplaceholder.typicode.com/users/2"
     user_url = base_url + "users/" + str(employee_id)
 
