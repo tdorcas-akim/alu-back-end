@@ -9,78 +9,71 @@ import requests
 import sys
 
 if __name__ == "__main__":
-    # Base URL for the API we are getting data from.
-    base_url = "https://jsonplaceholder.typicode.com/"
-
     # --- Step 1: Get and Validate the Employee ID ---
-    # We need to make sure the user ran the script with a number.
-    if len(sys.argv) < 2:
-        print("Usage: {} <employee_id>".format(sys.argv[0]))
+    # The script should be called with exactly one argument: the employee ID.
+    if len(sys.argv) != 2:
+        sys.stderr.write("Usage: {} <employee_id>\n".format(sys.argv[0]))
         sys.exit(1)
 
+    # We'll try to convert the argument to an integer. If it fails, it's bad input.
     try:
         employee_id = int(sys.argv[1])
     except ValueError:
-        print("Employee ID must be an integer.")
+        sys.stderr.write("Employee ID must be an integer\n")
         sys.exit(1)
 
-    # --- Step 2: Fetch Employee Details ---
-    # We need the employee's username for the CSV file.
-    # The URL looks like: https://jsonplaceholder.typicode.com/users/2
-    user_url = base_url + "users/{}".format(employee_id)
+    # --- Step 2: Fetch Data from the API ---
+    # We need both the employee's username and their list of tasks.
+    base_url = "https://jsonplaceholder.typicode.com"
     try:
+        # First, get the user's details to find their username.
+        user_url = "{}/users/{}".format(base_url, employee_id)
         user_response = requests.get(user_url)
-        user_response.raise_for_status()  # Check for HTTP errors like 404
+        user_response.raise_for_status()  # This will fail on a 404 Not Found
         user_data = user_response.json()
-        username = user_data.get("username")
-    except requests.exceptions.RequestException as e:
-        print("Error fetching user data: {}".format(e))
-        sys.exit(1)
-    except ValueError:
-        print("Could not decode JSON from user response.")
-        sys.exit(1)
+        username = user_data.get('username')
 
-    if not username:
-        print("Could not find user with ID {}".format(employee_id))
-        sys.exit(1)
+        if not username:
+            sys.stderr.write("User with ID {} not found\n".format(employee_id))
+            sys.exit(1)
 
-    # --- Step 3: Fetch the Employee's To-Do List ---
-    # This gets all tasks, both completed and not completed.
-    # The URL looks like: https://jsonplaceholder.typicode.com/todos?userId=2
-    todos_url = base_url + "todos"
-    query_params = {"userId": employee_id}
-    try:
-        todos_response = requests.get(todos_url, params=query_params)
+        # Next, get all the to-do items for this user.
+        todos_url = "{}/todos".format(base_url)
+        params = {"userId": employee_id}
+        todos_response = requests.get(todos_url, params=params)
         todos_response.raise_for_status()
         todos_data = todos_response.json()
+
     except requests.exceptions.RequestException as e:
-        print("Error fetching TODO list: {}".format(e))
+        # This catches network errors, timeouts, bad URLs, etc.
+        sys.stderr.write("Error communicating with API: {}\n".format(e))
         sys.exit(1)
     except ValueError:
-        print("Could not decode JSON from TODOs response.")
+        # This catches errors if the API response isn't valid JSON.
+        sys.stderr.write("Error decoding API response\n")
         sys.exit(1)
 
-    # --- Step 4: Write the Data to a CSV File ---
-    # The filename will be the employee's ID, like "2.csv".
+    # --- Step 3: Write the Data to a CSV File ---
+    # The filename is just the employee's ID with a .csv extension.
     csv_filename = "{}.csv".format(employee_id)
 
-    # We use 'with open' because it safely handles closing the file for us.
-    with open(csv_filename, mode='w', newline='') as csv_file:
-        # Create a writer object that will do the work of writing rows.
-        # quoting=csv.QUOTE_ALL makes sure all fields are wrapped in ""
-        csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
+    try:
+        # We open the file with 'with' so it's automatically closed.
+        # newline='' is important to prevent extra blank rows in the CSV.
+        with open(csv_filename, mode='w', newline='') as csv_file:
+            # The writer object does the work of formatting the CSV.
+            # We use QUOTE_ALL to make sure every field is in double quotes.
+            writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
 
-        # Now, we go through each task we fetched.
-        for task in todos_data:
-            # We create a list with the exact data needed for each row.
-            row = [
-                employee_id,
-                username,
-                task.get("completed"),
-                task.get("title")
-            ]
-            # Write this list as a new row in our CSV file.
-            csv_writer.writerow(row)
-
-    # There is no need to print anything to the console.
-    # The script will just create the file and exit.
+            # We go through each task and write one row for it in the CSV.
+            for task in todos_data:
+                writer.writerow([
+                    employee_id,
+                    username,
+                    task.get('completed'),
+                    task.get('title')
+                ])
+    except IOError as e:
+        sys.stderr.write("Error writing to file {}: {}\n".format(
+            csv_filename, e))
+        sys.exit(1)
