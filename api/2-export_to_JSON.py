@@ -29,7 +29,7 @@ if __name__ == "__main__":
         # We want to get the employee's username first
         user_url = "{}/users/{}".format(base_url, employee_id)
         user_response = requests.get(user_url)
-        user_response.raise_for_status(
+        user_response.raise_for_status()
         # This checks if the request worked
         user_data = user_response.json()
 
